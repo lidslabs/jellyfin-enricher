@@ -64,6 +64,7 @@ Setup:
    mkdir -p data && sudo chown 1000:1000 data
 ```
    (Use whatever `PUID:PGID` you set if you build locally.)
+   
 5. *(Optional)* Drop a splash image at `./data/splash.jpg` (or `.png`/`.webp`)
    for the login page background. Tune via `SPLASH_OVERLAY_OPACITY` (0.0 = no
    dark overlay, 1.0 = fully dark) and `SPLASH_BLUR` (`"4px"`, `"8px"`, or empty
