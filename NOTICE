@@ -1,0 +1,20 @@
+jellyfin-enricher
+=================
+
+This project bundles assets owned by third parties under their original
+licenses. The original code in this project is unencumbered by these
+attributions; they apply only to the bundled assets.
+
+----------------------------------------------------------------------
+Jellyfin icon (app/static/jellyfin-icon.svg)
+----------------------------------------------------------------------
+
+Source: https://github.com/jellyfin/jellyfin-ux/blob/master/branding/SVG/icon-transparent.svg
+Copyright: The Jellyfin contributors
+License: Creative Commons Attribution-ShareAlike 4.0 International
+         https://creativecommons.org/licenses/by-sa/4.0/
+
+This icon is used here to indicate interoperability with Jellyfin and
+is not an endorsement by the Jellyfin project. Per Jellyfin's branding
+guidelines, this is a third-party tool and is not affiliated with the
+Jellyfin project.

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · Jellyfin Enricher</title>
+<link rel="icon" type="image/svg+xml" href="/icon">
+<link rel="stylesheet" href="/static/styles.css">
+<style>
+  body.login-bg {
+    {% if splash_available %}
+    background-image: url('/splash');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    {% endif %}
+  }
+  body.login-bg::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 17, 21, {{ splash_overlay_opacity }});
+    {% if splash_blur %}backdrop-filter: blur({{ splash_blur }}); -webkit-backdrop-filter: blur({{ splash_blur }});{% endif %}
+    z-index: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body class="login-bg">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-brand">
+        <img src="/icon" alt="" class="login-icon">
+        <h1>Jellyfin Enricher</h1>
+        <p class="muted">
+          {% if auth_mode == 'jellyfin' %}
+            Sign in with your Jellyfin account
+          {% else %}
+            Sign in to continue
+          {% endif %}
+        </p>
+      </div>
+
+      {% if error %}
+      <div class="login-error">{{ error }}</div>
+      {% endif %}
+
+      {% if auth_mode == 'jellyfin' %}
+      <form method="post" action="/login/jellyfin?next={{ next|urlencode }}" autocomplete="on">
+      {% else %}
+      <form method="post" action="/login?next={{ next|urlencode }}" autocomplete="on">
+      {% endif %}
+        <label class="login-field">
+          <span>{% if auth_mode == 'jellyfin' %}Jellyfin Username{% else %}Username{% endif %}</span>
+          <input type="text" name="username" autocomplete="username" required autofocus spellcheck="false">
+        </label>
+        <label class="login-field">
+          <span>Password</span>
+          <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="btn-primary login-submit">Sign in</button>
+      </form>
+
+      <div class="login-alt-divider"><span>or</span></div>
+
+      {% if auth_mode == 'jellyfin' %}
+        <a href="/login?next={{ next|urlencode }}" class="btn-alt-auth">
+          Sign in with local account
+        </a>
+      {% else %}
+        {% if jellyfin_configured %}
+        <a href="/login/jellyfin?next={{ next|urlencode }}" class="btn-alt-auth">
+          <img src="/icon" alt="" class="btn-icon"> Sign in with Jellyfin
+        </a>
+        {% else %}
+        <button type="button" class="btn-alt-auth" disabled title="Configure Jellyfin in Settings first">
+          <img src="/icon" alt="" class="btn-icon"> Sign in with Jellyfin
+          <span class="muted alt-auth-hint">(configure first)</span>
+        </button>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

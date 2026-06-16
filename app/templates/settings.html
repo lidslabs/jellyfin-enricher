@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings · Jellyfin Enricher</title>
+<link rel="icon" type="image/svg+xml" href="/icon">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-row">
+      <h1>
+        <img src="/icon" alt="" class="brand-icon">
+        Jellyfin Enricher
+      </h1>
+      <div class="topbar-user">
+        <span class="muted user-pill">
+          {% if auth_method == 'jellyfin' %}
+            <img src="/icon" alt="" class="user-pill-icon" title="Signed in via Jellyfin">
+          {% endif %}
+          {{ user }}
+        </span>
+        <a href="/" class="topbar-link">← Back</a>
+        <a href="/logout" class="topbar-link">Sign out</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="settings-main">
+  <div class="settings-header">
+    <h2>Settings</h2>
+    <p class="muted">Database values override environment variables. Empty values fall back to env.</p>
+  </div>
+
+  {% if saved %}
+  <div class="settings-flash settings-flash-success">Settings saved.</div>
+  {% endif %}
+
+  {% if test_result %}
+    {% if test_result[0] %}
+    <div class="settings-flash settings-flash-success">✓ {{ test_result[1] }}</div>
+    {% else %}
+    <div class="settings-flash settings-flash-error">✗ {{ test_result[1] }}</div>
+    {% endif %}
+  {% endif %}
+
+  <section class="settings-section">
+    <h3>Jellyfin Connection</h3>
+
+    <form method="post" action="/settings" class="settings-form">
+      <div class="settings-field">
+        <label for="jellyfin_url">Jellyfin URL</label>
+        <input type="url" id="jellyfin_url" name="jellyfin_url"
+               value="{{ jellyfin_url }}"
+               placeholder="http://jellyfin:8096"
+               autocomplete="off"
+               spellcheck="false">
+        <div class="settings-hint">Source: <code>{{ jellyfin_url_source }}</code></div>
+      </div>
+
+      <div class="settings-field">
+        <label for="jellyfin_api_key">API Key</label>
+        <input type="password" id="jellyfin_api_key" name="jellyfin_api_key"
+               value=""
+               placeholder="{% if jellyfin_api_key_set %}(leave blank to keep current){% else %}Paste admin API key{% endif %}"
+               autocomplete="off"
+               spellcheck="false">
+        <div class="settings-hint">
+          Source: <code>{{ jellyfin_api_key_source }}</code>
+          {% if jellyfin_api_key_set %}
+          ·
+          <button type="submit"
+                  formaction="/settings/reset/jellyfin_api_key"
+                  formmethod="post"
+                  class="settings-link-btn">drop DB override</button>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="settings-actions">
+        <button type="submit" class="btn-primary">Save</button>
+        <button type="submit" formaction="/settings/test" formmethod="post" class="btn-secondary">Test Connection</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="settings-section">
+    <h3>About</h3>
+    <div class="settings-about">
+      <p class="muted">Bootstrap configuration (login credentials, session secret, splash settings) is managed via environment variables and requires a container restart to change.</p>
+      <p class="muted">Jellyfin icon © Jellyfin contributors, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

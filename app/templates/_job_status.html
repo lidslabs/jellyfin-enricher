@@ -1,0 +1,39 @@
+<li class="item-row job-row" id="job-{{ job.id }}"
+    {% if job.status in ['queued', 'running'] %}
+    hx-get="/api/job/{{ job.id }}"
+    hx-trigger="load delay:1500ms"
+    hx-target="#job-{{ job.id }}"
+    hx-swap="outerHTML"
+    {% endif %}>
+
+  <div class="meta">
+    <div class="title">{{ job.title }}</div>
+    <div class="muted">video id: <code>{{ job.youtube_id }}</code></div>
+    {% if job.log_lines %}
+    <details class="job-log" {% if job.status == 'error' %}open{% endif %}>
+      <summary>log ({{ job.log_lines|length }} lines)</summary>
+      <pre>{% for line in job.log_lines[-40:] %}{{ line }}
+{% endfor %}</pre>
+    </details>
+    {% endif %}
+    {% if job.error %}<div class="error">{{ job.error }}</div>{% endif %}
+    {% if job.status == 'success' and job.output_path %}
+      <div class="muted">wrote: <code>{{ job.output_path }}</code></div>
+    {% endif %}
+  </div>
+
+  <div class="job-side">
+    <div class="status status-{{ job.status }}">
+      {% if job.status == "success" %}✓ done
+      {% elif job.status == "error" %}✗ failed
+      {% elif job.status == "running" %}downloading…
+      {% else %}{{ job.status }}{% endif %}
+    </div>
+    {% if job.status in ('success', 'error') %}
+    <button class="btn-skip"
+            hx-post="/api/job/{{ job.id }}/dismiss"
+            hx-target="#job-{{ job.id }}"
+            hx-swap="outerHTML">Dismiss</button>
+    {% endif %}
+  </div>
+</li>

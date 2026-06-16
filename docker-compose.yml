@@ -1,0 +1,45 @@
+# docker-compose.yml for jellyfin-enricher
+#
+# Pulls the published image from ghcr.io. To build locally instead, see
+# the Dockerfile in this repo and use `docker compose build`.
+#
+# Adjust media mounts to match the paths your Jellyfin container sees.
+# The enricher resolves file existence against the in-container path,
+# so mounting at the same paths as Jellyfin avoids needing PATH_MAPPINGS.
+#
+# Bound to 127.0.0.1 by default. To proxy through BunkerWeb instead,
+# remove the port mapping and connect on the same network.
+
+services:
+  jellyfin-enricher:
+    image: ghcr.io/lidslabs/jellyfin-enricher:v0.1.0
+    container_name: jellyfin-enricher
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8765:8000"
+    environment:
+      JELLYFIN_URL: http://jellyfin:8096
+      JELLYFIN_API_KEY: ${JELLYFIN_API_KEY}
+      ENRICHER_USER: ${ENRICHER_USER:-admin}
+      ENRICHER_PASSWORD: ${ENRICHER_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET}
+      SESSION_HTTPS_ONLY: ${SESSION_HTTPS_ONLY:-false}
+      SPLASH_OVERLAY_OPACITY: ${SPLASH_OVERLAY_OPACITY:-0.65}
+      SPLASH_BLUR: ${SPLASH_BLUR:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # Uncomment if Jellyfin reports paths your container doesn't see:
+      # PATH_MAPPINGS: "/mnt/jellyfin/movies:/data/media1/movies"
+      # Uncomment if YouTube starts demanding sign-in:
+      # YTDLP_COOKIES_FILE: /var/lib/enricher/cookies.txt
+    volumes:
+      - ./data:/var/lib/enricher
+      # Adjust these to match your actual media mount paths.
+      # The enricher needs read+write to write extras alongside media files.
+      - /path/to/media1:/data/media1
+      - /path/to/media2:/data/media2
+    networks:
+      - media_net
+
+networks:
+  media_net:
+    external: true

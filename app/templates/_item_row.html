@@ -1,0 +1,55 @@
+<li class="item-row {% if not item.path_accessible %}row-disabled{% endif %}"
+    id="item-{{ item.jellyfin_id }}-{{ extras_type.value }}">
+
+  <img class="poster"
+       src="/api/image/{{ item.jellyfin_id }}"
+       alt=""
+       loading="lazy"
+       onerror="this.style.visibility='hidden'">
+
+  <div class="meta">
+    <div class="title">
+      {{ item.title }}{% if item.year %} <span class="year">({{ item.year }})</span>{% endif %}
+    </div>
+    <div class="path muted" title="{{ item.jellyfin_path }}">{{ item.jellyfin_path }}</div>
+    {% for note in item.notes %}
+      <div class="note-warning">⚠ {{ note }}</div>
+    {% endfor %}
+  </div>
+
+  <form class="action-form"
+        hx-post="/api/download"
+        hx-target="#item-{{ item.jellyfin_id }}-{{ extras_type.value }}"
+        hx-swap="outerHTML">
+    <input type="hidden" name="jellyfin_id" value="{{ item.jellyfin_id }}">
+    <input type="hidden" name="extras_type" value="{{ extras_type.value }}">
+    <input type="text"
+           name="youtube_input"
+           placeholder="YouTube ID or URL"
+           required
+           autocomplete="off"
+           spellcheck="false"
+           {% if not item.path_accessible %}disabled{% endif %}>
+    <button type="submit"
+            class="btn-primary"
+            {% if not item.path_accessible %}disabled{% endif %}>Download</button>
+  </form>
+
+  <div class="skip-actions">
+    <button class="btn-skip"
+            hx-post="/api/skip"
+            hx-target="#item-{{ item.jellyfin_id }}-{{ extras_type.value }}"
+            hx-swap="outerHTML"
+            hx-vals='{"jellyfin_id": "{{ item.jellyfin_id }}", "extras_type": "{{ extras_type.value }}", "permanent": "0"}'>
+      Skip
+    </button>
+    <button class="btn-skip-permanent"
+            hx-post="/api/skip"
+            hx-target="#item-{{ item.jellyfin_id }}-{{ extras_type.value }}"
+            hx-swap="outerHTML"
+            hx-confirm="Permanently skip “{{ item.title }}”? It won't appear in scans until you remove it from the Permanent Skips list."
+            hx-vals='{"jellyfin_id": "{{ item.jellyfin_id }}", "extras_type": "{{ extras_type.value }}", "permanent": "1", "title": "{{ item.title }}"{% if item.year %}, "year": "{{ item.year }}"{% endif %}}'>
+      Skip Permanently
+    </button>
+  </div>
+</li>

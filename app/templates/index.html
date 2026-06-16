@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jellyfin Enricher</title>
+<link rel="icon" type="image/svg+xml" href="/icon">
+<link rel="stylesheet" href="/static/styles.css">
+<script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-row">
+      <h1>
+        <img src="/icon" alt="" class="brand-icon">
+        Jellyfin Enricher
+      </h1>
+      <div class="topbar-user">
+        <span class="muted user-pill">
+          {% if auth_method == 'jellyfin' %}
+            <img src="/icon" alt="" class="user-pill-icon" title="Signed in via Jellyfin">
+          {% endif %}
+          {{ user }}
+        </span>
+        <a href="/settings" class="topbar-link">Settings</a>
+        <a href="/logout" class="topbar-link">Sign out</a>
+      </div>
+    </div>
+    <nav class="tabs">
+      {% for ext in extras_types %}
+        <button class="tab"
+                hx-get="/api/scan?extras_type={{ ext.type.value }}"
+                hx-target="#content"
+                hx-swap="innerHTML"
+                hx-indicator="#loading">{{ ext.label }}s</button>
+      {% endfor %}
+      <button class="tab tab-secondary"
+              hx-get="/api/permanent-skips"
+              hx-target="#content"
+              hx-swap="innerHTML"
+              hx-indicator="#loading">Permanent Skips</button>
+    </nav>
+  </div>
+</header>
+
+<div id="loading" class="htmx-indicator">Loading…</div>
+
+<main id="content">
+  <div class="welcome">
+    <p>Pick a category above to scan for missing extras.</p>
+    <p class="muted">Scans hit Jellyfin and verify each file on disk. Skips for the current session reset on rescan; permanent skips persist.</p>
+  </div>
+</main>
+
+<div id="toast-area"></div>
+</body>
+</html>

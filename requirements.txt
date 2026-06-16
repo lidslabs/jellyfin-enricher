@@ -1,0 +1,13 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+jinja2==3.1.5
+python-multipart==0.0.20
+httpx==0.28.1
+pydantic==2.10.4
+pydantic-settings==2.7.0
+# Required by Starlette's SessionMiddleware for cookie signing.
+# Not pulled in automatically by fastapi; must be explicit.
+itsdangerous==2.2.0
+# Note: yt-dlp[default] (installed in Dockerfile) pulls in curl_cffi and
+# yt-dlp-ejs automatically with versions matching the pinned yt-dlp release.
+# No need to pin those independently here.

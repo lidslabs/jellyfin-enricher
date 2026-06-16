@@ -1,0 +1,30 @@
+<div class="scan-header">
+  <h2>Permanent Skips <span class="count">{{ skips|length }}</span></h2>
+</div>
+
+{% if not skips %}
+  <p class="empty">No permanent skips.</p>
+{% else %}
+<ul class="item-list">
+  {% for s in skips %}
+    <li class="item-row" id="skip-{{ s.jellyfin_id }}-{{ s.extras_type }}">
+      <img class="poster" src="/api/image/{{ s.jellyfin_id }}" alt=""
+           loading="lazy" onerror="this.style.visibility='hidden'">
+      <div class="meta">
+        <div class="title">
+          {{ s.title }}{% if s.year %} <span class="year">({{ s.year }})</span>{% endif %}
+        </div>
+        <div class="muted">{{ s.extras_type }} · added {{ s.created_at }}</div>
+      </div>
+      <div></div>
+      <button class="btn-secondary"
+              hx-post="/api/permanent-skips/remove"
+              hx-target="#skip-{{ s.jellyfin_id }}-{{ s.extras_type }}"
+              hx-swap="outerHTML"
+              hx-vals='{"jellyfin_id": "{{ s.jellyfin_id }}", "extras_type": "{{ s.extras_type }}"}'>
+        Restore
+      </button>
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}

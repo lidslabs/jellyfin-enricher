@@ -1,0 +1,24 @@
+<div class="scan-header">
+  <h2>
+    {{ extras_def.label }}s
+    <span class="count">{{ shown }} missing</span>
+    {% if shown != total_missing %}
+      <span class="muted">({{ total_missing - shown }} skipped this session)</span>
+    {% endif %}
+  </h2>
+  <button class="btn-secondary"
+          hx-get="/api/scan?extras_type={{ extras_type.value }}&refresh=1"
+          hx-target="#content"
+          hx-swap="innerHTML"
+          hx-indicator="#loading">↻ Rescan</button>
+</div>
+
+{% if not items %}
+  <p class="empty">Nothing missing. ✓</p>
+{% else %}
+<ul class="item-list">
+  {% for item in items %}
+    {% include "_item_row.html" %}
+  {% endfor %}
+</ul>
+{% endif %}

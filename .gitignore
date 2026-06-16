@@ -1,0 +1,26 @@
+# Secrets — never commit
+.env
+
+# Runtime state — local to deployments, not source
+data/
+*.db
+*.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
