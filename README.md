@@ -48,6 +48,12 @@ Setup:
      python -c "import secrets; print(secrets.token_urlsafe(64))"
 ```
      Rotating this value invalidates all existing sessions; keep it stable.
+
+**Note on `.env` syntax:** Do not put inline comments after a value
+   (e.g. `SPLASH_OVERLAY_OPACITY=0.5  # 0-1`). The parser takes the rest
+   of the line as the value, which will fail validation at startup. Put
+   descriptive comments on the line above the variable instead.
+
 3. Adjust `docker-compose.yml` media volumes to match your Jellyfin mounts.
    The enricher resolves file existence against in-container paths, so mounting
    media at the same paths Jellyfin sees avoids needing `PATH_MAPPINGS`.
