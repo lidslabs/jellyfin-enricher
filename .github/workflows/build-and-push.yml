@@ -46,3 +46,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Detect pre-release
+        if: github.ref_type == 'tag'
+        id: prerelease
+        run: |
+          if [[ "${{ github.ref_name }}" =~ -(rc|alpha|beta|dev)\. ]]; then
+            echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
+          body: |
+            ## Pull
+
+```sh
+            docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+```
+
+            ## Changes
+
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for the full history.
