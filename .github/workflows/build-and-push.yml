@@ -38,7 +38,45 @@ jobs:
           flavor: |
             latest=false
 
-      - uses: docker/build-push-action@v5
+      - name: Build image locally for smoke test
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: enricher:smoketest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test — curl_cffi importable and Chrome impersonate target available
+        run: |
+          set -euo pipefail
+
+          # Belt: curl_cffi imports cleanly inside the image
+          docker run --rm --entrypoint python enricher:smoketest \
+            -c "import curl_cffi; print(f'curl_cffi {curl_cffi.__version__} importable')"
+
+          # Suspenders: yt-dlp sees Chrome as an available impersonate target.
+          # This catches both (a) curl_cffi missing entirely and (b) curl_cffi
+          # installed but version-mismatched against yt-dlp's expectations.
+          docker run --rm --entrypoint yt-dlp enricher:smoketest \
+            --list-impersonate-targets | tee targets.txt
+
+          if grep -qE '^Chrome\s+.*\(unavailable\)' targets.txt; then
+            echo "::error::Chrome impersonate target is unavailable — curl_cffi missing or version-mismatched"
+            exit 1
+          fi
+          if ! grep -qE '^Chrome' targets.txt; then
+            echo "::error::Chrome impersonate target not present in yt-dlp at all"
+            exit 1
+          fi
+
+          # Verify Deno is on PATH (yt-dlp's default JS runtime for YouTube)
+          docker run --rm --entrypoint deno enricher:smoketest --version
+
+          echo "✓ curl_cffi importable, Chrome impersonate available, Deno present"
+
+      - name: Push image (cache-hit from smoke test build)
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
