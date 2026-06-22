@@ -8,6 +8,8 @@ pydantic-settings==2.7.0
 # Required by Starlette's SessionMiddleware for cookie signing.
 # Not pulled in automatically by fastapi; must be explicit.
 itsdangerous==2.2.0
-# Note: yt-dlp[default] (installed in Dockerfile) pulls in curl_cffi and
-# yt-dlp-ejs automatically with versions matching the pinned yt-dlp release.
-# No need to pin those independently here.
+# yt-dlp and its extras (yt-dlp-ejs via [default], curl_cffi via [curl-cffi])
+# are installed in the Dockerfile via `yt-dlp[default,curl-cffi]==<pin>`. The
+# Dockerfile is the single source of truth for those versions — do NOT add
+# curl_cffi or yt-dlp-ejs here, as that creates two competing version pins.
+# See Dockerfile YTDLP_VERSION ARG.

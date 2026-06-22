@@ -40,10 +40,21 @@ RUN groupadd -g ${PGID} enricher \
     && chown -R enricher:enricher /var/lib/enricher
 
 WORKDIR /app
-
 COPY requirements.txt .
+
+# yt-dlp's [default] and [curl-cffi] are INDEPENDENT optional-dependency groups
+# in its pyproject.toml — installing [default] alone does NOT pull curl_cffi.
+# Both are required for the enricher:
+#   [default]   → yt-dlp-ejs (JS challenge solver), mutagen, brotli, certifi,
+#                 pycryptodomex, requests, urllib3, websockets
+#   [curl-cffi] → curl_cffi for TLS/JA3 fingerprint impersonation, required
+#                 by --impersonate (see app/config.py:ytdlp_impersonate)
+# curl_cffi's version is pinned by yt-dlp itself — do NOT add curl_cffi to
+# requirements.txt or it will fight yt-dlp's version constraint.
+# See: https://github.com/yt-dlp/yt-dlp#impersonation
+
 RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir "yt-dlp[default]==${YTDLP_VERSION}"
+    && pip install --no-cache-dir "yt-dlp[default,curl-cffi]==${YTDLP_VERSION}"
 
 COPY --chown=enricher:enricher app/ ./app/
 
