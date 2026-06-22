@@ -17,10 +17,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # exact version independently of Debian's package freeze.
 ARG YTDLP_VERSION=2026.06.09
 
-# yt-dlp (2026.06.09+) requires a JavaScript runtime for full YouTube format
-# extraction; Deno is yt-dlp's default and needs no extra --js-runtimes flag.
-# Without this, downloads fall back to limited format APIs (android-vr-player).
-# Bump this when yt-dlp's minimum Deno version moves; current floor is 2.3.
+# Current yt-dlp requires a JavaScript runtime for full YouTube format
+# extraction. The JS runtime requirement landed in yt-dlp 2025.11.12 — see
+# https://github.com/yt-dlp/yt-dlp/issues/15012. Deno is yt-dlp's default
+# runtime and needs no extra --js-runtimes flag as long as the binary is on
+# PATH. Without a JS runtime, downloads fall back to limited format APIs
+# (android-vr-player) and may silently lose formats for logged-in flows.
+#
+# Bump DENO_VERSION when yt-dlp release notes signal a minimum version bump.
+# 2.8.3 is comfortably above the believed-to-be-2.3 floor that was current
+# when this image was first built; no public yt-dlp doc cites that floor,
+# so treat it as informational only.
 ARG DENO_VERSION=v2.8.3
 RUN curl -fsSL -o /tmp/deno.zip \
         "https://github.com/denoland/deno/releases/download/${DENO_VERSION}/deno-x86_64-unknown-linux-gnu.zip" \
