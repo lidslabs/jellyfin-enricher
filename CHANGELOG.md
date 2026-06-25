@@ -3,11 +3,24 @@
 All notable changes to lidslabs/jellyfin-enricher.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-Versioning: standard semver.
+Versioning: standard semver. Each entry leads with a prose summary and an
+optional `### Highlights` block; CI extracts those into the GitHub release notes.
 
 ## [Unreleased]
 
 ## [0.1.1] - 2026-06-22
+
+Reliability and release-infrastructure release. Fixes YouTube downloads that
+were failing because yt-dlp's Chrome impersonation was unavailable, and adds a
+CI smoke test that gates publishing on that capability.
+
+### Highlights
+- **Fixed broken YouTube downloads.** yt-dlp is now installed with the
+  `[default,curl-cffi]` extras so `--impersonate chrome` works — `[default]`
+  alone does not pull `curl_cffi`.
+- **CI now gates publishing on a smoke test:** `curl_cffi` imports, the Chrome
+  impersonate target is available, and Deno is present, all verified before the
+  image is pushed.
 
 ### Fixed
 - yt-dlp `--impersonate chrome` failed at YoutubeDL init with

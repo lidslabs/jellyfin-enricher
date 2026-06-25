@@ -24,3 +24,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Private AI-agent docs — persistent project memory, never pushed.
+# CLAUDE.md is the session-start operating card; .project/ is the manual.
+# Convention to mirror across all lidslabs repos (jellyfin-hdr, media-utils).
+/CLAUDE.md
+.project/

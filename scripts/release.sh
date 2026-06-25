@@ -6,6 +6,13 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$CURRENT_BRANCH" != "main" ]]; then
+    echo "ERROR: releases are cut from main, but HEAD is '$CURRENT_BRANCH'." >&2
+    echo "Merge the work branch into main (via PR), then re-run from main." >&2
+    exit 1
+fi
+
 if [[ -n "$(git status --porcelain)" ]]; then
     echo "ERROR: working tree dirty. Commit version bump first." >&2
     git status --short >&2
@@ -17,6 +24,13 @@ TAG="v${VERSION}"
 
 if git rev-parse "$TAG" >/dev/null 2>&1; then
     echo "ERROR: tag $TAG already exists. Bump VERSION." >&2
+    exit 1
+fi
+
+if ! grep -qE "^## \[${VERSION}\]" CHANGELOG.md; then
+    echo "ERROR: no CHANGELOG.md entry for [${VERSION}]." >&2
+    echo "Add a '## [${VERSION}] - <date>' section first — the GitHub release notes are" >&2
+    echo "extracted from it (lead paragraph + '### Highlights')." >&2
     exit 1
 fi
 
