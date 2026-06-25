@@ -6,8 +6,6 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: standard semver. Each entry leads with a prose summary and an
 optional `### Highlights` block; CI extracts those into the GitHub release notes.
 
-## [Unreleased]
-
 ## [0.1.1] - 2026-06-22
 
 Reliability and release-infrastructure release. Fixes YouTube downloads that
